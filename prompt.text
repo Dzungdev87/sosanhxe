@@ -1,0 +1,199 @@
+You are a senior full-stack engineer.
+
+Build a complete production-ready web app similar to nanoreview.net but for car comparison.
+
+STACK REQUIREMENTS:
+- Next.js (App Router)
+- TypeScript
+- TailwindCSS
+- Supabase data online
+- API routes (Next.js)
+- Server-side rendering (SSR + SEO optimized)
+- Clean, modular architecture
+
+---
+
+CORE FEATURES:
+
+1. CAR DATABASE
+- Table: cars
+Fields:
+  id, name, brand, segment,
+  engine_hp, torque,
+  fuel_consumption,
+  price,
+  seats,
+  ground_clearance,
+  length, width, height, wheelbase
+- Include Prisma schema
+- Add seed script for at least 10 sample cars
+
+---
+
+2. CSV IMPORT SYSTEM
+- Create API endpoint: POST /api/import
+- Accept CSV upload
+- Parse CSV and insert/update database
+- Validate fields (number types, missing values)
+
+---
+
+3. SEARCH FUNCTION
+- Input: user types 2 car names
+- Autocomplete suggestions
+- Redirect to:
+  /compare/[car1]-vs-[car2]
+
+---
+
+4. COMPARE ENGINE (IMPORTANT)
+
+Create a reusable comparison engine:
+
+Rules:
+- engine_hp → higher is better
+- torque → higher is better
+- fuel_consumption → lower is better
+- price → lower is better
+- seats → higher is better
+- ground_clearance → higher is better
+- length/width/wheelbase → higher is better
+
+Implement function:
+
+compareField(a, b, rule)
+return:
+{
+  aBetter: boolean,
+  bBetter: boolean
+}
+
+---
+
+5. COMPARE PAGE (MAIN FEATURE)
+
+Route:
+- /compare/[slug]
+
+Example:
+- /compare/toyota-vios-vs-honda-city
+
+Features:
+- Fetch both cars from DB
+- Run compare engine
+- Render table:
+
+FOR EACH FIELD:
+- Highlight better value:
+  - bold text
+  - green color for better
+- No "winner" text, only visual highlight
+
+Include sections:
+- Overview
+- Dimensions
+- Performance
+- Fuel consumption
+- Interior
+- Safety
+- Price
+
+---
+
+6. SEO OPTIMIZATION
+
+- Each compare page must include:
+  - dynamic title:
+    "Toyota Vios vs Honda City - Full Comparison"
+  - meta description
+  - structured data (JSON-LD)
+
+---
+
+7. AUTO GENERATE & SCALE
+
+- System must support 1000+ cars
+- Dynamic routing (NO static pre-build required)
+- Generate slug automatically
+
+Helper:
+function slugify(name)
+
+---
+
+8. VOTE SYSTEM (IMPORTANT)
+
+Database:
+votes table:
+- id
+- car_a
+- car_b
+- ip
+- vote (A or B)
+- created_at
+
+API:
+POST /api/vote
+
+Logic:
+- Only 1 vote per IP per comparison
+- If duplicate → reject
+
+Frontend:
+- Like buttons under comparison
+- Show vote percentage
+
+---
+
+9. UI REQUIREMENTS
+
+- Clean UI similar to nanoreview:
+  - comparison table centered
+  - mobile responsive
+  - highlight cells clearly
+- Use TailwindCSS
+- No heavy UI library
+
+---
+
+10. BONUS (OPTIONAL)
+
+- AI summary section:
+  “Which car is better for you?”
+- Generate simple text summary
+
+---
+
+PROJECT STRUCTURE:
+
+- /app
+  /compare/[slug]/page.tsx
+  /api/compare/route.ts
+  /api/import/route.ts
+  /api/vote/route.ts
+- /lib
+  compareEngine.ts
+  db.ts
+- /components
+  CompareTable.tsx
+  SearchBox.tsx
+
+---
+
+DELIVERABLE:
+
+- Full codebase
+- Working example
+- Instructions:
+  - how to run project
+  - how to seed DB
+  - how to import CSV
+
+---
+
+IMPORTANT:
+- Keep code clean and modular
+- Avoid overengineering
+- The app must run immediately after setup
+
+Now generate the full repository.

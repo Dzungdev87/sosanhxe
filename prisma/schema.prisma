@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Car {
+  id                String   @id @default(cuid())
+  name              String
+  slug              String   @unique
+  brand             String
+  segment           String
+  origin            String   @default("Vietnam assembly")
+  releaseYear       Int      @default(2025) @map("release_year")
+  platform          String   @default("Not specified")
+  drivetrain        String   @default("FWD")
+  frontSuspension   String   @default("MacPherson") @map("front_suspension")
+  rearSuspension    String   @default("Torsion beam") @map("rear_suspension")
+  engine            String   @default("1.5L")
+  engineHp          Int      @map("engine_hp")
+  torque            Int
+  transmission      String   @default("CVT")
+  fuelConsumption   Float    @map("fuel_consumption")
+  batteryType       String   @default("Không áp dụng") @map("battery_type")
+  batteryCapacity   Float    @default(0) @map("battery_capacity")
+  acceleration0100  Float    @default(0) @map("acceleration_0_100")
+  price             Int
+  basePrice         Int      @default(0) @map("base_price")
+  topPrice          Int      @default(0) @map("top_price")
+  seats             Int
+  groundClearance   Int      @map("ground_clearance")
+  length            Int
+  width             Int
+  height            Int
+  wheelbase         Int
+  curbWeight        Int      @default(0) @map("curb_weight")
+  grossWeight       Int      @default(0) @map("gross_weight")
+  turningRadius     Float    @default(0) @map("turning_radius")
+  cargoVolume       Int      @default(0) @map("cargo_volume")
+  fuelTankCapacity  Int      @default(0) @map("fuel_tank_capacity")
+  frontBrake        String   @default("Disc") @map("front_brake")
+  rearBrake         String   @default("Disc") @map("rear_brake")
+  tireWheel         String   @default("Not specified") @map("tire_wheel")
+  ledHeadlights     Boolean  @default(false) @map("led_headlights")
+  autoHeadlights    Boolean  @default(false) @map("auto_headlights")
+  electricMirrors   Boolean  @default(false) @map("electric_mirrors")
+  sunroof           Boolean  @default(false)
+  screenSize        Float    @default(8) @map("screen_size")
+  appleCarplay      Boolean  @default(true) @map("apple_carplay")
+  androidAuto       Boolean  @default(true) @map("android_auto")
+  bluetooth         Boolean  @default(true)
+  usb               Boolean  @default(true)
+  speakers          Int      @default(4)
+  wirelessCharging  Boolean  @default(false) @map("wireless_charging")
+  leatherSeats      Boolean  @default(true) @map("leather_seats")
+  cabinSpace        String   @default("Standard") @map("cabin_space")
+  electricParkingBrake Boolean @default(false) @map("electric_parking_brake")
+  autoHold          Boolean  @default(false) @map("auto_hold")
+  hud               Boolean  @default(false)
+  driveModes        Boolean  @default(false) @map("drive_modes")
+  paddleShifters    Boolean  @default(false) @map("paddle_shifters")
+  cruiseControl     Boolean  @default(false) @map("cruise_control")
+  adaptiveCruiseControl Boolean @default(false) @map("adaptive_cruise_control")
+  airbags           Int      @default(2)
+  absEbd            Boolean  @default(true) @map("abs_ebd")
+  brakeAssist       Boolean  @default(true) @map("brake_assist")
+  esp               Boolean  @default(true)
+  tractionControl   Boolean  @default(true) @map("traction_control")
+  hillStartAssist   Boolean  @default(false) @map("hill_start_assist")
+  blindSpotWarning  Boolean  @default(false) @map("blind_spot_warning")
+  rearCamera        Boolean  @default(false) @map("rear_camera")
+  camera360         Boolean  @default(false) @map("camera_360")
+  laneAssist        Boolean  @default(false) @map("lane_assist")
+  aeb               Boolean  @default(false)
+  rearCrossTrafficAlert Boolean @default(false) @map("rear_cross_traffic_alert")
+  tirePressureMonitoring Boolean @default(false) @map("tire_pressure_monitoring")
+  parkingSensors    Boolean  @default(false) @map("parking_sensors")
+  isofix            Boolean  @default(false)
+  safety            String   @default("Standard active and passive safety package")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  votesAsA          Vote[]   @relation("VoteCarA")
+  votesAsB          Vote[]   @relation("VoteCarB")
+
+  @@index([brand])
+  @@index([segment])
+  @@map("cars")
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  carA      String   @map("car_a")
+  carB      String   @map("car_b")
+  ip        String
+  vote      VoteSide
+  createdAt DateTime @default(now()) @map("created_at")
+  carARef   Car      @relation("VoteCarA", fields: [carA], references: [id], onDelete: Cascade)
+  carBRef   Car      @relation("VoteCarB", fields: [carB], references: [id], onDelete: Cascade)
+
+  @@unique([carA, carB, ip])
+  @@index([carA, carB])
+  @@map("votes")
+}
+
+model Comment {
+  id          String        @id @default(cuid())
+  targetType  String        @map("target_type")
+  targetId    String        @map("target_id")
+  displayName String        @map("display_name")
+  content     String
+  ipHash      String        @map("ip_hash")
+  status      CommentStatus @default(PENDING)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@index([targetType, targetId, status, createdAt])
+  @@index([ipHash, status])
+  @@map("comments")
+}
+
+enum VoteSide {
+  A
+  B
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
