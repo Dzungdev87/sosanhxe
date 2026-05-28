@@ -26,6 +26,7 @@ const booleanFromCsv = z.preprocess((value) => {
 
 const csvCarSchema = z.object({
   name: z.string().min(1),
+  image_key: z.string().trim().optional(),
   brand: z.string().min(1),
   segment: z.string().min(1),
   origin: z.string().min(1).optional(),
@@ -42,9 +43,9 @@ const csvCarSchema = z.object({
   battery_type: z.string().min(1).optional(),
   battery_capacity: numberFromCsv.pipe(z.number().nonnegative()).optional(),
   acceleration_0_100: numberFromCsv.pipe(z.number().nonnegative()).optional(),
-  price: numberFromCsv.pipe(z.number().int().nonnegative()),
-  base_price: numberFromCsv.pipe(z.number().int().nonnegative()).optional(),
-  top_price: numberFromCsv.pipe(z.number().int().nonnegative()).optional(),
+  price: numberFromCsv.pipe(z.number().int().nonnegative()).transform(BigInt),
+  base_price: numberFromCsv.pipe(z.number().int().nonnegative()).transform(BigInt).optional(),
+  top_price: numberFromCsv.pipe(z.number().int().nonnegative()).transform(BigInt).optional(),
   seats: numberFromCsv.pipe(z.number().int().positive()),
   ground_clearance: numberFromCsv.pipe(z.number().int().nonnegative()),
   length: numberFromCsv.pipe(z.number().int().positive()),
@@ -130,6 +131,7 @@ export async function POST(request: NextRequest) {
     const car = result.data;
     const optionalData = {
       origin: car.origin,
+      imageKey: car.image_key || undefined,
       releaseYear: car.release_year,
       platform: car.platform,
       drivetrain: car.drivetrain,

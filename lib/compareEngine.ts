@@ -5,7 +5,9 @@ export type CompareResult = {
   bBetter: boolean;
 };
 
-export function compareField(a: number | null | undefined, b: number | null | undefined, rule: CompareRule): CompareResult {
+type NumericValue = number | bigint | null | undefined;
+
+export function compareField(a: NumericValue, b: NumericValue, rule: CompareRule): CompareResult {
   if (rule === "neutral" || rule === "true" || a == null || b == null || a === b) {
     return { aBetter: false, bBetter: false };
   }
@@ -26,7 +28,7 @@ export function compareValue(a: unknown, b: unknown, rule: CompareRule): Compare
     return { aBetter: a, bBetter: b };
   }
 
-  if (typeof a === "number" && typeof b === "number") {
+  if ((typeof a === "number" || typeof a === "bigint") && (typeof b === "number" || typeof b === "bigint")) {
     return compareField(a, b, rule);
   }
 

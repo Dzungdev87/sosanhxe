@@ -9,7 +9,8 @@ export async function GET() {
       name: true,
       brand: true,
       slug: true,
-      segment: true
+      segment: true,
+      imageKey: true
     }
   });
 

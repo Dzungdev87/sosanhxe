@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const carUpdateSchema = z.object({
   name: z.string().min(1),
+  imageKey: z.string().trim().nullable().optional().transform((value) => value || null),
   brand: z.string().min(1),
   segment: z.string().min(1),
   origin: z.string().min(1),
@@ -18,9 +19,9 @@ export const carUpdateSchema = z.object({
   batteryType: z.string().min(1),
   batteryCapacity: z.coerce.number().nonnegative(),
   acceleration0100: z.coerce.number().nonnegative(),
-  price: z.coerce.number().int().nonnegative(),
-  basePrice: z.coerce.number().int().nonnegative(),
-  topPrice: z.coerce.number().int().nonnegative(),
+  price: z.coerce.number().int().nonnegative().transform(BigInt),
+  basePrice: z.coerce.number().int().nonnegative().transform(BigInt),
+  topPrice: z.coerce.number().int().nonnegative().transform(BigInt),
   seats: z.coerce.number().int().positive(),
   groundClearance: z.coerce.number().int().nonnegative(),
   length: z.coerce.number().int().positive(),

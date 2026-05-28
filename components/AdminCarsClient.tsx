@@ -10,6 +10,7 @@ type EditableCar = Omit<Car, "createdAt" | "updatedAt"> & {
 
 const textFields: Array<{ key: keyof EditableCar; label: string; group: string }> = [
   { key: "name", label: "Tên xe", group: "Thông tin cơ bản" },
+  { key: "imageKey", label: "Cloudinary image key", group: "Thông tin cơ bản" },
   { key: "brand", label: "Hãng", group: "Thông tin cơ bản" },
   { key: "segment", label: "Phân khúc", group: "Thông tin cơ bản" },
   { key: "origin", label: "Xuất xứ", group: "Thông tin cơ bản" },

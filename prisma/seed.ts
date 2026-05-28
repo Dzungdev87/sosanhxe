@@ -267,6 +267,7 @@ async function main() {
       where: { slug: slugify(name) },
       update: {
         name,
+        imageKey: `${slugify(name)}.jpg`,
         brand,
         segment,
         ...extra,
@@ -284,6 +285,7 @@ async function main() {
       create: {
         slug: slugify(name),
         name,
+        imageKey: `${slugify(name)}.jpg`,
         brand,
         segment,
         ...extra,

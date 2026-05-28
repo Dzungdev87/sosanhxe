@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { serializeBigInt } from "@/lib/serialize";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -22,10 +23,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "One or both cars were not found" }, { status: 404 });
   }
 
-  return NextResponse.json({
+  return NextResponse.json(serializeBigInt({
     cars: {
       carA: cars.find((car) => car.slug === carA),
       carB: cars.find((car) => car.slug === carB)
     }
-  });
+  }));
 }

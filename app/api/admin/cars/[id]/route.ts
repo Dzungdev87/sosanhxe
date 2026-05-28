@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { isAdminRequest, unauthorizedAdminResponse } from "@/lib/adminAuth";
 import { carUpdateSchema } from "@/lib/carValidation";
 import { prisma } from "@/lib/db";
+import { serializeBigInt } from "@/lib/serialize";
 import { slugify } from "@/lib/slug";
 
 type RouteProps = {
@@ -21,7 +22,7 @@ export async function GET(_request: NextRequest, { params }: RouteProps) {
     return NextResponse.json({ error: "Không tìm thấy xe" }, { status: 404 });
   }
 
-  return NextResponse.json({ car });
+  return NextResponse.json(serializeBigInt({ car }));
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteProps) {
@@ -52,7 +53,7 @@ export async function PATCH(request: NextRequest, { params }: RouteProps) {
       }
     });
 
-    return NextResponse.json({ car });
+    return NextResponse.json(serializeBigInt({ car }));
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json({ error: "Tên xe tạo slug bị trùng với xe khác" }, { status: 409 });

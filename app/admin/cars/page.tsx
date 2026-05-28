@@ -4,6 +4,7 @@ import AdminCarsClient from "@/components/AdminCarsClient";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 import { prisma } from "@/lib/db";
+import { serializeBigInt } from "@/lib/serialize";
 
 export const metadata = {
   title: "Admin quản lý xe",
@@ -45,7 +46,7 @@ export default async function AdminCarsPage() {
         </div>
         <AdminLogoutButton />
       </div>
-      <AdminCarsClient initialCars={cars} />
+      <AdminCarsClient initialCars={serializeBigInt(cars)} />
     </main>
   );
 }

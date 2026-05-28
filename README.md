@@ -19,7 +19,7 @@ Production-ready Next.js App Router MVP for SEO-friendly car comparisons, backed
 npm install
 ```
 
-2. Create `.env` from `.env.example` and fill your Supabase PostgreSQL URLs:
+2. Create `.env` from `.env.example` and fill your Supabase PostgreSQL and Cloudinary values:
 
 ```bash
 cp .env.example .env
@@ -52,10 +52,37 @@ curl -X POST http://localhost:3000/api/import \
 Required CSV headers:
 
 ```text
-name,brand,segment,engine_hp,torque,fuel_consumption,price,seats,ground_clearance,length,width,height,wheelbase
+name,image_key,brand,segment,engine_hp,torque,fuel_consumption,price,seats,ground_clearance,length,width,height,wheelbase
 ```
 
+`image_key` is optional. Store car images in Cloudinary under `NEXT_PUBLIC_CLOUDINARY_CARS_FOLDER` and use a file key such as `byd-seal.jpg`; the frontend renders it through a Cloudinary 800x600 transform.
+
 Rows are validated and upserted by generated slug.
+
+## Car Images
+
+Download Toyota V-Car images from VnExpress into `D:\1. Pictures\1SosanhCar`:
+
+```bash
+npm run images:crawl:toyota
+```
+
+Upload the downloaded images to Cloudinary with public IDs under `NEXT_PUBLIC_CLOUDINARY_CARS_FOLDER`:
+
+```bash
+npm run images:upload:toyota
+```
+
+Cloudinary upload mode requires these `.env` values:
+
+```text
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+NEXT_PUBLIC_CLOUDINARY_CARS_FOLDER=cars
+```
+
+The script writes `manifest.json` and `image-keys.csv` next to the downloaded images. Use `image_key` values from that CSV in car data.
 
 ## Example Routes
 

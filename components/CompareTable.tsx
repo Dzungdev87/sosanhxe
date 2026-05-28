@@ -6,16 +6,18 @@ function formatValue(value: unknown, unit: string, key?: string) {
     return value ? "Có" : "Không";
   }
 
-  if (typeof value === "number") {
+  if (typeof value === "number" || typeof value === "bigint") {
+    const isZero = value === 0 || value === BigInt(0);
+
     if (key === "releaseYear") {
       return String(value);
     }
 
-    if (unit === "VND" && value === 0) {
+    if (unit === "VND" && isZero) {
       return "-";
     }
 
-    if (value === 0 && unit !== "") {
+    if (isZero && unit !== "") {
       return "-";
     }
 

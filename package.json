@@ -10,7 +10,14 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "images:crawl:toyota": "tsx scripts/crawl-vnexpress-car-images.ts",
+    "images:upload:toyota": "tsx scripts/crawl-vnexpress-car-images.ts --upload",
+    "images:push:toyota": "tsx scripts/upload-toyota-folder-images.ts",
+    "cars:crawl:vinfast": "tsx scripts/crawl-vinfast-vcar.ts",
+    "cars:crawl:hyundai": "tsx scripts/crawl-hyundai-vcar.ts",
+    "cars:crawl:kia": "tsx scripts/crawl-hyundai-vcar.ts https://vnexpress.net/oto-xe-may/v-car/hang-xe/kia-14 10",
+    "cars:crawl:mitsubishi": "tsx scripts/crawl-hyundai-vcar.ts https://vnexpress.net/oto-xe-may/v-car/hang-xe/mitsubishi-23 7"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

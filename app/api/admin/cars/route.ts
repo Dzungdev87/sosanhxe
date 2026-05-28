@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { isAdminRequest, unauthorizedAdminResponse } from "@/lib/adminAuth";
 import { prisma } from "@/lib/db";
+import { serializeBigInt } from "@/lib/serialize";
 
 export async function GET(request: NextRequest) {
   if (!isAdminRequest(request)) {
@@ -12,5 +13,5 @@ export async function GET(request: NextRequest) {
     orderBy: [{ updatedAt: "desc" }, { name: "asc" }]
   });
 
-  return NextResponse.json({ cars });
+  return NextResponse.json(serializeBigInt({ cars }));
 }

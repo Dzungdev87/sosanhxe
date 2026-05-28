@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import type { Car } from "@prisma/client";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import CarImage from "@/components/CarImage";
 import CommentsSection from "@/components/CommentsSection";
 import CompareTable from "@/components/CompareTable";
 import VoteButtons from "@/components/VoteButtons";
 import { publicCommentSelect } from "@/lib/comments";
 import { prisma } from "@/lib/db";
 import { compareField } from "@/lib/compareEngine";
+import { recordCarComparison } from "@/lib/carMetrics";
 import { getVoteTotals } from "@/lib/votes";
 import { parseCompareSlug } from "@/lib/slug";
 
@@ -86,6 +88,7 @@ export default async function ComparePage({ params }: PageProps) {
   }
 
   const { carA, carB } = data;
+  await recordCarComparison(carA.id, carB.id);
   const votes = await getVoteTotals(carA.id, carB.id);
   const comments = await prisma.comment.findMany({
     where: {
@@ -137,14 +140,17 @@ export default async function ComparePage({ params }: PageProps) {
 
       <section className="mb-6 grid gap-4 md:grid-cols-2">
         {[carA, carB].map((car) => (
-          <div key={car.id} className="rounded-lg border border-line bg-white p-5">
-            <div className="text-sm font-semibold text-muted">{car.brand}</div>
-            <h2 className="mt-1 text-2xl font-bold text-ink">{car.name}</h2>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <Stat label="Giá" value={`${new Intl.NumberFormat("vi-VN").format(car.price)} VND`} />
-              <Stat label="Công suất" value={`${car.engineHp} mã lực`} />
-              <Stat label="Tiêu hao" value={`${car.fuelConsumption} lít/100 km`} />
-              <Stat label="Phân khúc" value={car.segment} />
+          <div key={car.id} className="overflow-hidden rounded-lg border border-line bg-white">
+            <CarImage imageKey={car.imageKey} alt={car.name} width={400} height={300} priority sizes="400px" className="mx-auto" />
+            <div className="p-5">
+              <div className="text-sm font-semibold text-muted">{car.brand}</div>
+              <h2 className="mt-1 text-2xl font-bold text-ink">{car.name}</h2>
+              <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                <Stat label="Giá" value={`${new Intl.NumberFormat("vi-VN").format(car.price)} VND`} />
+                <Stat label="Công suất" value={`${car.engineHp} mã lực`} />
+                <Stat label="Tiêu hao" value={`${car.fuelConsumption} lít/100 km`} />
+                <Stat label="Phân khúc" value={car.segment} />
+              </div>
             </div>
           </div>
         ))}
@@ -278,7 +284,7 @@ function carJsonLd(car: Car, position: number) {
       offers: {
         "@type": "Offer",
         priceCurrency: "VND",
-        price: car.price,
+        price: Number(car.price),
         availability: "https://schema.org/InStock"
       }
     }

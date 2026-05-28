@@ -12,6 +12,7 @@ model Car {
   id                String   @id @default(cuid())
   name              String
   slug              String   @unique
+  imageKey          String?  @map("image_key")
   brand             String
   segment           String
   origin            String   @default("Vietnam assembly")
@@ -28,9 +29,9 @@ model Car {
   batteryType       String   @default("Không áp dụng") @map("battery_type")
   batteryCapacity   Float    @default(0) @map("battery_capacity")
   acceleration0100  Float    @default(0) @map("acceleration_0_100")
-  price             Int
-  basePrice         Int      @default(0) @map("base_price")
-  topPrice          Int      @default(0) @map("top_price")
+  price             BigInt
+  basePrice         BigInt   @default(0) @map("base_price")
+  topPrice          BigInt   @default(0) @map("top_price")
   seats             Int
   groundClearance   Int      @map("ground_clearance")
   length            Int
@@ -85,10 +86,44 @@ model Car {
   updatedAt         DateTime @updatedAt @map("updated_at")
   votesAsA          Vote[]   @relation("VoteCarA")
   votesAsB          Vote[]   @relation("VoteCarB")
+  monthlyMetrics    CarMonthlyMetric[]
+  comparisonMetricsAsA ComparisonMonthlyMetric[] @relation("ComparisonMetricCarA")
+  comparisonMetricsAsB ComparisonMonthlyMetric[] @relation("ComparisonMetricCarB")
 
   @@index([brand])
   @@index([segment])
   @@map("cars")
+}
+
+model CarMonthlyMetric {
+  id           String   @id @default(cuid())
+  carId        String   @map("car_id")
+  period       String
+  viewCount    Int      @default(0) @map("view_count")
+  compareCount Int      @default(0) @map("compare_count")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  car          Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@unique([carId, period])
+  @@index([period, viewCount, compareCount])
+  @@map("car_monthly_metrics")
+}
+
+model ComparisonMonthlyMetric {
+  id           String   @id @default(cuid())
+  carAId       String   @map("car_a_id")
+  carBId       String   @map("car_b_id")
+  period       String
+  compareCount Int      @default(0) @map("compare_count")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  carA         Car      @relation("ComparisonMetricCarA", fields: [carAId], references: [id], onDelete: Cascade)
+  carB         Car      @relation("ComparisonMetricCarB", fields: [carBId], references: [id], onDelete: Cascade)
+
+  @@unique([carAId, carBId, period])
+  @@index([period, compareCount])
+  @@map("comparison_monthly_metrics")
 }
 
 model Vote {
