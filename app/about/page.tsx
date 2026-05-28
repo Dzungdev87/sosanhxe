@@ -4,7 +4,10 @@ import { StaticPage } from "@/components/StaticPage";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "About So Sanh Xe, a car comparison project for buyers who want clear specifications and pricing context."
+  description: "About So Sanh Xe, a car comparison project for buyers who want clear specifications and pricing context.",
+  alternates: {
+    canonical: "/about"
+  }
 };
 
 export default function AboutPage() {

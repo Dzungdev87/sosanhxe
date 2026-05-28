@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import SearchBox from "@/components/SearchBox";
@@ -5,6 +6,41 @@ import { currentMetricPeriod } from "@/lib/carMetrics";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sosanhcar.com";
+const homeTitle = "So Sánh Xe - So sánh 2 xe ô tô chi tiết nhất Việt Nam";
+const homeDescription =
+  "So sánh xe ô tô theo giá bán, thông số kỹ thuật, kích thước, động cơ, tiêu hao nhiên liệu, tiện nghi, an toàn và bình chọn từ người dùng.";
+const ogImageUrl =
+  "https://res.cloudinary.com/dfv1e9p8p/image/upload/f_auto,q_auto,c_fill,g_auto,w_1200,h_630/v1779982502/sosanhxe/logos/sosanhxe-logo.jpg";
+
+export const metadata: Metadata = {
+  title: homeTitle,
+  description: homeDescription,
+  alternates: {
+    canonical: "/"
+  },
+  openGraph: {
+    title: homeTitle,
+    description: homeDescription,
+    url: "/",
+    type: "website",
+    images: [
+      {
+        url: ogImageUrl,
+        width: 1200,
+        height: 630,
+        alt: "So Sánh Xe"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: homeTitle,
+    description: homeDescription,
+    images: [ogImageUrl]
+  }
+};
 
 export default async function HomePage() {
   const period = currentMetricPeriod();
@@ -37,6 +73,7 @@ export default async function HomePage() {
 
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildHomeJsonLd()) }} />
       <section className="border-b border-line bg-white">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
@@ -117,6 +154,30 @@ export default async function HomePage() {
       </section>
     </main>
   );
+}
+
+function buildHomeJsonLd() {
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "So Sánh Xe",
+      url: siteUrl,
+      inLanguage: "vi-VN",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${siteUrl}/compare?query={search_term_string}`,
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "So Sánh Xe",
+      url: siteUrl,
+      logo: "https://res.cloudinary.com/dfv1e9p8p/image/upload/v1779982502/sosanhxe/logos/sosanhxe-logo.jpg"
+    }
+  ];
 }
 
 type CarSummary = {

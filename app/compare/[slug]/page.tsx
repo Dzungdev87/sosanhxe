@@ -15,6 +15,9 @@ import { parseCompareSlug } from "@/lib/slug";
 
 export const dynamic = "force-dynamic";
 
+const ogImageUrl =
+  "https://res.cloudinary.com/dfv1e9p8p/image/upload/f_auto,q_auto,c_fill,g_auto,w_1200,h_630/v1779982502/sosanhxe/logos/sosanhxe-logo.jpg";
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
@@ -44,7 +47,7 @@ async function getCars(slug: string) {
 }
 
 function siteUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://sosanhcar.com";
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -74,7 +77,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       type: "article",
-      url: `/compare/${slug}`
+      url: `/compare/${slug}`,
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${data.carA.name} vs ${data.carB.name}`
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl]
     }
   };
 }

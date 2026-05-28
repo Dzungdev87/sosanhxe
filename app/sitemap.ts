@@ -2,17 +2,18 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 
 function siteUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://sosanhcar.com";
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteUrl();
-  const cars = await prisma.car.findMany({
-    orderBy: { updatedAt: "desc" },
-    select: {
-      slug: true,
-      updatedAt: true
-    }
+  const popularComparisons = await prisma.comparisonMonthlyMetric.findMany({
+    include: {
+      carA: { select: { slug: true, updatedAt: true } },
+      carB: { select: { slug: true, updatedAt: true } }
+    },
+    orderBy: [{ compareCount: "desc" }, { updatedAt: "desc" }],
+    take: 250
   });
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -60,17 +61,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   ];
 
-  const compareRoutes: MetadataRoute.Sitemap = [];
-  for (let i = 0; i < cars.length; i++) {
-    for (let j = i + 1; j < cars.length; j++) {
-      compareRoutes.push({
-        url: `${baseUrl}/compare/${cars[i].slug}-vs-${cars[j].slug}`,
-        lastModified: cars[i].updatedAt > cars[j].updatedAt ? cars[i].updatedAt : cars[j].updatedAt,
-        changeFrequency: "weekly",
-        priority: 0.6
-      });
-    }
-  }
+  const compareRoutes: MetadataRoute.Sitemap = popularComparisons.map((comparison) => ({
+    url: `${baseUrl}/compare/${comparison.carA.slug}-vs-${comparison.carB.slug}`,
+    lastModified:
+      comparison.carA.updatedAt > comparison.carB.updatedAt ? comparison.carA.updatedAt : comparison.carB.updatedAt,
+    changeFrequency: "weekly",
+    priority: 0.6
+  }));
 
   return [...staticRoutes, ...compareRoutes];
 }

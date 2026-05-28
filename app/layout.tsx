@@ -4,21 +4,45 @@ import Link from "next/link";
 import "./globals.css";
 
 const logoUrl = "https://res.cloudinary.com/dfv1e9p8p/image/upload/v1779982502/sosanhxe/logos/sosanhxe-logo.jpg";
+const ogImageUrl =
+  "https://res.cloudinary.com/dfv1e9p8p/image/upload/f_auto,q_auto,c_fill,g_auto,w_1200,h_630/v1779982502/sosanhxe/logos/sosanhxe-logo.jpg";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sosanhcar.com";
+const siteName = "So Sánh Xe";
+const siteDescription =
+  "So sánh xe ô tô tại Việt Nam theo giá bán, động cơ, kích thước, tiêu hao nhiên liệu, tiện nghi, an toàn, bình chọn và bình luận.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
+  applicationName: siteName,
   title: {
-    default: "So Sanh Xe - Detailed car comparison",
-    template: "%s | So Sanh Xe"
+    default: "So Sánh Xe - So sánh ô tô chi tiết tại Việt Nam",
+    template: "%s | So Sánh Xe"
   },
-  description: "Compare car specifications, dimensions, engines, fuel consumption, prices, comfort features, safety systems, votes, and comments.",
+  description: siteDescription,
   icons: {
     icon: "/icon.svg"
   },
   openGraph: {
     type: "website",
-    siteName: "So Sanh Xe",
-    locale: "vi_VN"
+    siteName,
+    title: "So Sánh Xe - So sánh ô tô chi tiết tại Việt Nam",
+    description: siteDescription,
+    url: "/",
+    locale: "vi_VN",
+    images: [
+      {
+        url: ogImageUrl,
+        width: 1200,
+        height: 630,
+        alt: "So Sánh Xe"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "So Sánh Xe - So sánh ô tô chi tiết tại Việt Nam",
+    description: siteDescription,
+    images: [ogImageUrl]
   }
 };
 
@@ -41,6 +65,7 @@ export default function RootLayout({
                 priority
                 className="h-9 w-auto rounded-md object-contain sm:h-11"
               />
+              <span className="sr-only">So Sánh Xe</span>
             </Link>
             <nav className="flex items-center gap-5 text-sm font-medium text-muted">
               <Link href="/cars" className="hover:text-ink">

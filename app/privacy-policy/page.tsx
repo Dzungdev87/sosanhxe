@@ -3,7 +3,10 @@ import { StaticPage } from "@/components/StaticPage";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "Privacy policy for So Sanh Xe, including information about logs, cookies, comments, votes, and contact messages."
+  description: "Privacy policy for So Sanh Xe, including information about logs, cookies, comments, votes, and contact messages.",
+  alternates: {
+    canonical: "/privacy-policy"
+  }
 };
 
 export default function PrivacyPolicyPage() {
@@ -51,7 +54,7 @@ export default function PrivacyPolicyPage() {
 
       <h2>Contact</h2>
       <p>
-        For privacy questions, email <a href="mailto:contact@sosanhxe.local">contact@sosanhxe.local</a>.
+        For privacy questions, email <a href="mailto:contact@sosanhcar.com">contact@sosanhcar.com</a>.
       </p>
     </StaticPage>
   );

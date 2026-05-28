@@ -4,7 +4,10 @@ import { StaticPage } from "@/components/StaticPage";
 
 export const metadata: Metadata = {
   title: "FAQ",
-  description: "Frequently asked questions about So Sanh Xe car data, comparison logic, prices, votes, and comments."
+  description: "Frequently asked questions about So Sanh Xe car data, comparison logic, prices, votes, and comments.",
+  alternates: {
+    canonical: "/faq"
+  }
 };
 
 const questions = [
