@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import "./globals.css";
 
 const logoUrl = "https://res.cloudinary.com/dfv1e9p8p/image/upload/v1779982502/sosanhxe/logos/sosanhxe-logo.jpg";
@@ -53,6 +54,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-TK00NKEML0"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-TK00NKEML0');
+        `}
+      </Script>
       <body className="min-h-screen antialiased">
         <header className="border-b border-line bg-white">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
