@@ -114,7 +114,7 @@ export default async function HomePage() {
                     </Link>
                   ))
                 ) : (
-                  <EmptyState>Chưa có dữ liệu xem hoặc so sánh trong tháng {period}.</EmptyState>
+                  <EmptyState>Chưa có dữ liệu xem hoặc so sánh trong năm {period}.</EmptyState>
                 )}
               </div>
             </section>
@@ -146,7 +146,7 @@ export default async function HomePage() {
                   </Link>
                 ))
               ) : (
-                <EmptyState>Chưa có cặp so sánh phổ biến trong tháng {period}.</EmptyState>
+                <EmptyState>Chưa có cặp so sánh phổ biến trong năm {period}.</EmptyState>
               )}
             </div>
           </aside>

@@ -3,13 +3,11 @@ import { prisma } from "@/lib/db";
 export function currentMetricPeriod(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Ho_Chi_Minh",
-    year: "numeric",
-    month: "2-digit"
+    year: "numeric"
   }).formatToParts(date);
   const year = parts.find((part) => part.type === "year")?.value ?? String(date.getUTCFullYear());
-  const month = parts.find((part) => part.type === "month")?.value ?? String(date.getUTCMonth() + 1).padStart(2, "0");
 
-  return `${year}-${month}`;
+  return year;
 }
 
 export async function recordCarComparison(carAId: string, carBId: string) {

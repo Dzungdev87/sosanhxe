@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 
 export const metadata = {
   title: "Top xe được xem và so sánh nhiều nhất",
-  description: "Top 10 xe được xem và được so sánh nhiều nhất trong tháng.",
+  description: "Top 10 xe được xem và được so sánh nhiều nhất trong năm.",
   alternates: {
     canonical: "/cars"
   }
@@ -39,7 +39,7 @@ export default async function CarsPage() {
     <main className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="text-3xl font-bold tracking-tight text-ink">Top 10 xe được xem và so sánh nhiều nhất</h1>
       <p className="mt-3 text-sm text-muted">
-        Bảng xếp hạng tính theo tổng lượt xem và lượt so sánh trong tháng {period}. Khi sang tháng mới, lượt tính bắt đầu lại từ 0.
+        Bảng xếp hạng tính theo tổng lượt xem và lượt so sánh trong năm {period}. Khi sang năm mới, lượt tính bắt đầu lại từ 0.
       </p>
       <div className="mt-6 overflow-hidden rounded-lg border border-line bg-white">
         <table className="w-full min-w-[720px] text-left text-sm">
@@ -78,7 +78,7 @@ export default async function CarsPage() {
             ) : (
               <tr>
                 <td className="px-4 py-6 text-center text-muted" colSpan={6}>
-                  Chưa có dữ liệu xem hoặc so sánh trong tháng này.
+                  Chưa có dữ liệu xem hoặc so sánh trong năm nay.
                 </td>
               </tr>
             )}
