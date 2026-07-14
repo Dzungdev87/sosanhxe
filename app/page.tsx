@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import SearchBox from "@/components/SearchBox";
 import { currentMetricPeriod } from "@/lib/carMetrics";
 import { prisma } from "@/lib/db";
+import { buildPostImageUrl } from "@/lib/postImages";
 
 export const dynamic = "force-dynamic";
 
@@ -44,14 +46,28 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const period = currentMetricPeriod();
-  const latestCars = await prisma.car.findMany({
-    orderBy: [{ updatedAt: "desc" }, { name: "asc" }],
-    take: 6
-  });
-  const topCarMetrics = await prisma.carMonthlyMetric.findMany({
-    where: { period },
-    include: { car: true }
-  });
+  const [latestCars, topCarMetrics, popularComparisons, latestPosts] = await Promise.all([
+    prisma.car.findMany({
+      orderBy: [{ updatedAt: "desc" }, { name: "asc" }],
+      take: 6,
+    }),
+    prisma.carMonthlyMetric.findMany({
+      where: { period },
+      include: { car: true },
+    }),
+    prisma.comparisonMonthlyMetric.findMany({
+      where: { period },
+      include: { carA: true, carB: true },
+      orderBy: [{ compareCount: "desc" }, { updatedAt: "desc" }],
+      take: 6,
+    }),
+    prisma.post.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+      take: 5,
+      select: { id: true, title: true, slug: true, excerpt: true, coverImageKey: true, publishedAt: true, createdAt: true },
+    }),
+  ]);
   const topCars = topCarMetrics
     .map((metric) => ({
       ...metric,
@@ -63,12 +79,6 @@ export default async function HomePage() {
       return b.viewCount - a.viewCount;
     })
     .slice(0, 6);
-  const popularComparisons = await prisma.comparisonMonthlyMetric.findMany({
-    where: { period },
-    include: { carA: true, carB: true },
-    orderBy: [{ compareCount: "desc" }, { updatedAt: "desc" }],
-    take: 6
-  });
   const compareTargets = [...latestCars, ...topCars.map((item) => item.car)];
 
   return (
@@ -129,26 +139,77 @@ export default async function HomePage() {
             </section>
           </div>
 
-          <aside>
-            <h2 className="mb-4 text-xl font-bold text-ink">Top so sánh 2 xe phổ biến nhất</h2>
-            <div className="space-y-3">
-              {popularComparisons.length > 0 ? (
-                popularComparisons.map((comparison) => (
-                  <Link
-                    key={comparison.id}
-                    href={`/compare/${comparison.carA.slug}-vs-${comparison.carB.slug}`}
-                    className="block rounded-lg border border-line bg-white p-4 text-sm font-semibold text-ink hover:border-good"
-                  >
-                    <div>{comparison.carA.name} vs {comparison.carB.name}</div>
-                    <div className="mt-1 text-xs font-normal text-muted">
-                      {new Intl.NumberFormat("vi-VN").format(comparison.compareCount)} lượt so sánh
-                    </div>
+          <aside className="space-y-8">
+            <section>
+              <h2 className="mb-4 text-xl font-bold text-ink">Top so sánh 2 xe phổ biến nhất</h2>
+              <div className="space-y-3">
+                {popularComparisons.length > 0 ? (
+                  popularComparisons.map((comparison) => (
+                    <Link
+                      key={comparison.id}
+                      href={`/compare/${comparison.carA.slug}-vs-${comparison.carB.slug}`}
+                      className="block rounded-lg border border-line bg-white p-4 text-sm font-semibold text-ink hover:border-good"
+                    >
+                      <div>{comparison.carA.name} vs {comparison.carB.name}</div>
+                      <div className="mt-1 text-xs font-normal text-muted">
+                        {new Intl.NumberFormat("vi-VN").format(comparison.compareCount)} lượt so sánh
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <EmptyState>Chưa có cặp so sánh phổ biến trong năm {period}.</EmptyState>
+                )}
+              </div>
+            </section>
+
+            {latestPosts.length > 0 && (
+              <section>
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-ink">Chuyện của xe</h2>
+                  <Link href="/chuyen-cua-xe" className="text-sm font-semibold text-good hover:opacity-80">
+                    Xem tất cả →
                   </Link>
-                ))
-              ) : (
-                <EmptyState>Chưa có cặp so sánh phổ biến trong năm {period}.</EmptyState>
-              )}
-            </div>
+                </div>
+                <div className="space-y-3">
+                  {latestPosts.map((post) => {
+                    const imageUrl = buildPostImageUrl(post.coverImageKey, { width: 120, height: 80 });
+                    const dateStr = new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" }).format(
+                      new Date(post.publishedAt ?? post.createdAt)
+                    );
+                    return (
+                      <Link
+                        key={post.id}
+                        href={`/chuyen-cua-xe/${post.slug}`}
+                        className="flex gap-3 rounded-lg border border-line bg-white p-3 hover:border-good"
+                      >
+                        {imageUrl ? (
+                          <div className="flex-shrink-0 overflow-hidden rounded-md">
+                            <Image
+                              src={imageUrl}
+                              alt={post.title}
+                              width={80}
+                              height={60}
+                              className="h-[60px] w-[80px] object-cover"
+                              unoptimized
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex h-[60px] w-[80px] flex-shrink-0 items-center justify-center rounded-md bg-surface">
+                            <svg className="h-6 w-6 text-muted opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-ink line-clamp-2 leading-snug">{post.title}</p>
+                          <time className="mt-1 block text-xs text-muted">{dateStr}</time>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
           </aside>
         </div>
       </section>

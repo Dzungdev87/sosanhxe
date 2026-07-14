@@ -85,7 +85,10 @@ export const compareSections = [
   },
   {
     title: "Tiêu thụ nhiên liệu",
-    fields: [{ key: "fuelConsumption", label: "Mức tiêu thụ hỗn hợp", rule: "lower", unit: "lít/100 km" }]
+    fields: [
+      { key: "fuelConsumption", label: "Mức tiêu thụ hỗn hợp (xăng/dầu)", rule: "lower", unit: "lít/100 km" },
+      { key: "energyConsumption", label: "Tiêu thụ điện (xe điện)", rule: "lower", unit: "kWh/100 km" }
+    ]
   },
   {
     title: "Pin / hiệu suất điện",

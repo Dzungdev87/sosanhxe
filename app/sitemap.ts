@@ -7,14 +7,21 @@ function siteUrl() {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteUrl();
-  const popularComparisons = await prisma.comparisonMonthlyMetric.findMany({
-    include: {
-      carA: { select: { slug: true, updatedAt: true } },
-      carB: { select: { slug: true, updatedAt: true } }
-    },
-    orderBy: [{ compareCount: "desc" }, { updatedAt: "desc" }],
-    take: 250
-  });
+  const [popularComparisons, publishedPosts] = await Promise.all([
+    prisma.comparisonMonthlyMetric.findMany({
+      include: {
+        carA: { select: { slug: true, updatedAt: true } },
+        carB: { select: { slug: true, updatedAt: true } }
+      },
+      orderBy: [{ compareCount: "desc" }, { updatedAt: "desc" }],
+      take: 250
+    }),
+    prisma.post.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: [{ publishedAt: "desc" }],
+      select: { slug: true, updatedAt: true, publishedAt: true },
+    }),
+  ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -54,6 +61,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.4
     },
     {
+      url: `${baseUrl}/chuyen-cua-xe`,
+      lastModified: publishedPosts[0]?.updatedAt ?? new Date(),
+      changeFrequency: "daily",
+      priority: 0.8
+    },
+    {
       url: `${baseUrl}/privacy-policy`,
       lastModified: new Date(),
       changeFrequency: "yearly",
@@ -69,5 +82,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6
   }));
 
-  return [...staticRoutes, ...compareRoutes];
+  const postRoutes: MetadataRoute.Sitemap = publishedPosts.map((post) => ({
+    url: `${baseUrl}/chuyen-cua-xe/${post.slug}`,
+    lastModified: post.updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.7
+  }));
+
+  return [...staticRoutes, ...compareRoutes, ...postRoutes];
 }

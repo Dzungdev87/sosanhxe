@@ -42,6 +42,9 @@ export default async function AdminCarsPage() {
             <Link href="/admin/comments" className="hover:text-ink">
               Duyệt comment
             </Link>
+            <Link href="/admin/posts" className="hover:text-ink">
+              Chuyện của xe
+            </Link>
           </div>
         </div>
         <AdminLogoutButton />

@@ -53,6 +53,15 @@ export default function CompareTable({ carA, carB }: { carA: Car; carB: Car }) {
             {section.fields.map((field) => {
               const valueA = carA[field.key as keyof Car];
               const valueB = carB[field.key as keyof Car];
+
+              // Ẩn row nếu cả hai xe đều có giá trị 0 (trường không áp dụng)
+              const bothZero =
+                (valueA === 0 || valueA === null || valueA === undefined) &&
+                (valueB === 0 || valueB === null || valueB === undefined);
+              if (bothZero && (field.unit === "lít/100 km" || field.unit === "kWh/100 km")) {
+                return null;
+              }
+
               const result = compareValue(valueA, valueB, field.rule);
 
               return (

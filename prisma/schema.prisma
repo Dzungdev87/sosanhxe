@@ -25,9 +25,10 @@ model Car {
   engineHp          Int      @map("engine_hp")
   torque            Int
   transmission      String   @default("CVT")
-  fuelConsumption   Float    @map("fuel_consumption")
-  batteryType       String   @default("Không áp dụng") @map("battery_type")
-  batteryCapacity   Float    @default(0) @map("battery_capacity")
+  fuelConsumption      Float    @map("fuel_consumption")
+  energyConsumption    Float    @default(0) @map("energy_consumption")
+  batteryType          String   @default("Không áp dụng") @map("battery_type")
+  batteryCapacity      Float    @default(0) @map("battery_capacity")
   acceleration0100  Float    @default(0) @map("acceleration_0_100")
   price             BigInt
   basePrice         BigInt   @default(0) @map("base_price")
@@ -155,6 +156,29 @@ model Comment {
   @@index([targetType, targetId, status, createdAt])
   @@index([ipHash, status])
   @@map("comments")
+}
+
+model Post {
+  id               String     @id @default(cuid())
+  title            String
+  slug             String     @unique
+  excerpt          String     @default("")
+  content          String     @db.Text
+  coverImageKey    String?    @map("cover_image_key")
+  metaTitle        String     @default("") @map("meta_title")
+  metaDescription  String     @default("") @map("meta_description")
+  status           PostStatus @default(DRAFT)
+  publishedAt      DateTime?  @map("published_at")
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
+
+  @@index([status, publishedAt])
+  @@map("posts")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
 }
 
 enum VoteSide {

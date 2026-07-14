@@ -87,6 +87,9 @@ export default function RootLayout({
               <Link href="/compare" className="hover:text-ink">
                 Compare
               </Link>
+              <Link href="/chuyen-cua-xe" className="hover:text-ink">
+                Chuyện của xe
+              </Link>
               <Link href="/about" className="hover:text-ink">
                 About
               </Link>
@@ -110,6 +113,9 @@ export default function RootLayout({
             <div>
               <h2 className="font-bold text-ink">Cộng đồng</h2>
               <div className="mt-3 space-y-2">
+                <Link href="/chuyen-cua-xe" className="block hover:text-ink">
+                  Chuyện của xe
+                </Link>
                 <Link href="/contact" className="block hover:text-ink">
                   Contact Us
                 </Link>
