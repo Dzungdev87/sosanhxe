@@ -14,7 +14,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     orderBy: [{ compareCount: "desc" }, { updatedAt: "desc" }],
     take: 250
-  });
+  }).catch(() => []);
+
   const publishedPosts = await prisma.post
     .findMany({
       where: { status: "PUBLISHED" },
@@ -74,13 +75,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   ];
 
-  const compareRoutes: MetadataRoute.Sitemap = popularComparisons.map((comparison) => ({
-    url: `${baseUrl}/compare/${comparison.carA.slug}-vs-${comparison.carB.slug}`,
-    lastModified:
-      comparison.carA.updatedAt > comparison.carB.updatedAt ? comparison.carA.updatedAt : comparison.carB.updatedAt,
-    changeFrequency: "weekly",
-    priority: 0.6
-  }));
+  const compareRoutes: MetadataRoute.Sitemap = popularComparisons
+    .filter((comparison) => comparison && comparison.carA && comparison.carB)
+    .map((comparison) => ({
+      url: `${baseUrl}/compare/${comparison.carA.slug}-vs-${comparison.carB.slug}`,
+      lastModified:
+        comparison.carA.updatedAt > comparison.carB.updatedAt ? comparison.carA.updatedAt : comparison.carB.updatedAt,
+      changeFrequency: "weekly",
+      priority: 0.6
+    }));
 
   const postRoutes: MetadataRoute.Sitemap = publishedPosts.map((post) => ({
     url: `${baseUrl}/chuyen-cua-xe/${post.slug}`,
