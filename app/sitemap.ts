@@ -7,21 +7,21 @@ function siteUrl() {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteUrl();
-  const [popularComparisons, publishedPosts] = await Promise.all([
-    prisma.comparisonMonthlyMetric.findMany({
-      include: {
-        carA: { select: { slug: true, updatedAt: true } },
-        carB: { select: { slug: true, updatedAt: true } }
-      },
-      orderBy: [{ compareCount: "desc" }, { updatedAt: "desc" }],
-      take: 250
-    }),
-    prisma.post.findMany({
+  const popularComparisons = await prisma.comparisonMonthlyMetric.findMany({
+    include: {
+      carA: { select: { slug: true, updatedAt: true } },
+      carB: { select: { slug: true, updatedAt: true } }
+    },
+    orderBy: [{ compareCount: "desc" }, { updatedAt: "desc" }],
+    take: 250
+  });
+  const publishedPosts = await prisma.post
+    .findMany({
       where: { status: "PUBLISHED" },
       orderBy: [{ publishedAt: "desc" }],
       select: { slug: true, updatedAt: true, publishedAt: true },
-    }),
-  ]);
+    })
+    .catch(() => []);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

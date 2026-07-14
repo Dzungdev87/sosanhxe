@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const period = currentMetricPeriod();
-  const [latestCars, topCarMetrics, popularComparisons, latestPosts] = await Promise.all([
+  const [latestCars, topCarMetrics, popularComparisons] = await Promise.all([
     prisma.car.findMany({
       orderBy: [{ updatedAt: "desc" }, { name: "asc" }],
       take: 6,
@@ -61,13 +61,16 @@ export default async function HomePage() {
       orderBy: [{ compareCount: "desc" }, { updatedAt: "desc" }],
       take: 6,
     }),
-    prisma.post.findMany({
+  ]);
+  // Fallback nếu bảng posts chưa tồn tại trên DB production
+  const latestPosts = await prisma.post
+    .findMany({
       where: { status: "PUBLISHED" },
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
       take: 5,
       select: { id: true, title: true, slug: true, excerpt: true, coverImageKey: true, publishedAt: true, createdAt: true },
-    }),
-  ]);
+    })
+    .catch(() => []);
   const topCars = topCarMetrics
     .map((metric) => ({
       ...metric,
