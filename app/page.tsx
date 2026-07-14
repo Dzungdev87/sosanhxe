@@ -73,23 +73,28 @@ export default async function HomePage() {
       .catch(() => []),
   ]);
 
-  const latestCars = carsResult.status === "fulfilled" ? carsResult.value : [];
-  const topCarMetrics = metricsResult.status === "fulfilled" ? metricsResult.value : [];
-  const popularComparisons = comparisonsResult.status === "fulfilled" ? comparisonsResult.value : [];
-  const latestPosts = postsResult.status === "fulfilled" ? postsResult.value : [];
+  const latestCars = carsResult.status === "fulfilled" && Array.isArray(carsResult.value) ? carsResult.value : [];
+  const topCarMetrics = metricsResult.status === "fulfilled" && Array.isArray(metricsResult.value) ? metricsResult.value : [];
+  const popularComparisons = comparisonsResult.status === "fulfilled" && Array.isArray(comparisonsResult.value) ? comparisonsResult.value : [];
+  const latestPosts = postsResult.status === "fulfilled" && Array.isArray(postsResult.value) ? postsResult.value : [];
 
   const topCars = topCarMetrics
+    .filter((metric) => metric && metric.car)
     .map((metric) => ({
       ...metric,
-      totalCount: metric.viewCount + metric.compareCount
+      totalCount: (metric.viewCount ?? 0) + (metric.compareCount ?? 0)
     }))
     .sort((a, b) => {
       if (b.totalCount !== a.totalCount) return b.totalCount - a.totalCount;
-      if (b.compareCount !== a.compareCount) return b.compareCount - a.compareCount;
-      return b.viewCount - a.viewCount;
+      if ((b.compareCount ?? 0) !== (a.compareCount ?? 0)) return (b.compareCount ?? 0) - (a.compareCount ?? 0);
+      return (b.viewCount ?? 0) - (a.viewCount ?? 0);
     })
     .slice(0, 6);
-  const compareTargets = [...latestCars, ...topCars.map((item) => item.car)];
+
+  const compareTargets = [
+    ...latestCars.filter((c) => c && c.id && c.slug),
+    ...topCars.map((item) => item.car).filter((c) => c && c.id && c.slug)
+  ];
 
   return (
     <main>
@@ -154,18 +159,20 @@ export default async function HomePage() {
               <h2 className="mb-4 text-xl font-bold text-ink">Top so sánh 2 xe phổ biến nhất</h2>
               <div className="space-y-3">
                 {popularComparisons.length > 0 ? (
-                  popularComparisons.map((comparison) => (
-                    <Link
-                      key={comparison.id}
-                      href={`/compare/${comparison.carA.slug}-vs-${comparison.carB.slug}`}
-                      className="block rounded-lg border border-line bg-white p-4 text-sm font-semibold text-ink hover:border-good"
-                    >
-                      <div>{comparison.carA.name} vs {comparison.carB.name}</div>
-                      <div className="mt-1 text-xs font-normal text-muted">
-                        {new Intl.NumberFormat("vi-VN").format(comparison.compareCount)} lượt so sánh
-                      </div>
-                    </Link>
-                  ))
+                  popularComparisons
+                    .filter((c) => c && c.carA && c.carB)
+                    .map((comparison) => (
+                      <Link
+                        key={comparison.id}
+                        href={`/compare/${comparison.carA.slug}-vs-${comparison.carB.slug}`}
+                        className="block rounded-lg border border-line bg-white p-4 text-sm font-semibold text-ink hover:border-good"
+                      >
+                        <div>{comparison.carA.name} vs {comparison.carB.name}</div>
+                        <div className="mt-1 text-xs font-normal text-muted">
+                          {new Intl.NumberFormat("vi-VN").format(comparison.compareCount)} lượt so sánh
+                        </div>
+                      </Link>
+                    ))
                 ) : (
                   <EmptyState>Chưa có cặp so sánh phổ biến trong năm {period}.</EmptyState>
                 )}
@@ -281,7 +288,8 @@ function EmptyState({ children }: { children: ReactNode }) {
 }
 
 function findCompareTarget(carId: string, cars: CarSummary[]) {
-  return cars.find((item) => item.id !== carId);
+  if (!Array.isArray(cars)) return undefined;
+  return cars.find((item) => item && item.id && item.id !== carId);
 }
 
 function buildCompareHref(slug: string, targetSlug?: string) {

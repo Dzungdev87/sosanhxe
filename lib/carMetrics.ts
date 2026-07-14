@@ -1,13 +1,15 @@
 import { prisma } from "@/lib/db";
 
 export function currentMetricPeriod(date = new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Ho_Chi_Minh",
-    year: "numeric"
-  }).formatToParts(date);
-  const year = parts.find((part) => part.type === "year")?.value ?? String(date.getUTCFullYear());
-
-  return year;
+  try {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      year: "numeric"
+    }).formatToParts(date);
+    return parts.find((part) => part.type === "year")?.value ?? String(date.getFullYear());
+  } catch (e) {
+    return String(date.getFullYear());
+  }
 }
 
 export async function recordCarComparison(carAId: string, carBId: string) {
