@@ -164,8 +164,8 @@ export default async function ComparePage({ params }: PageProps) {
               <h2 className="mt-1 text-2xl font-bold text-ink">{car.name}</h2>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <Stat label="Giá" value={`${new Intl.NumberFormat("vi-VN").format(car.price)} VND`} />
-                <Stat label="Công suất" value={`${car.engineHp} mã lực`} />
-                <Stat label="Tiêu hao" value={`${car.fuelConsumption} lít/100 km`} />
+                <Stat label="Công suất" value={car.engineHp ? `${car.engineHp} mã lực` : "Chưa cập nhật"} />
+                <Stat label="Động cơ" value={car.engine || "Chưa cập nhật"} />
                 <Stat label="Phân khúc" value={car.segment} />
               </div>
             </div>

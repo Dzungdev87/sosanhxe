@@ -54,12 +54,26 @@ export default function CompareTable({ carA, carB }: { carA: Car; carB: Car }) {
               const valueA = carA[field.key as keyof Car];
               const valueB = carB[field.key as keyof Car];
 
-              // Ẩn row nếu cả hai xe đều có giá trị 0 (trường không áp dụng)
-              const bothZero =
-                (valueA === 0 || valueA === null || valueA === undefined) &&
-                (valueB === 0 || valueB === null || valueB === undefined);
-              if (bothZero && (field.unit === "lít/100 km" || field.unit === "kWh/100 km")) {
-                return null;
+              /**
+               * Logic ẩn/hiện cho 2 dòng tiêu thụ nhiên liệu:
+               *
+               * - 2 xe xăng:  fuelConsumption > 0, energyConsumption = 0 (cả 2)
+               *               → ẩn dòng kWh, hiện dòng lít
+               *
+               * - 2 xe điện:  fuelConsumption = 0 (cả 2), energyConsumption > 0
+               *               → ẩn dòng lít, hiện dòng kWh
+               *
+               * - Xăng vs Điện: 1 dòng có 1 giá trị > 0, 1 giá trị = 0
+               *               → hiện cả 2 dòng (giá trị 0 hiển thị là "-")
+               */
+              const isFuelRow = field.key === "fuelConsumption";
+              const isEnergyRow = field.key === "energyConsumption";
+
+              if (isFuelRow || isEnergyRow) {
+                const aIsZero = typeof valueA !== "number" || valueA === 0;
+                const bIsZero = typeof valueB !== "number" || valueB === 0;
+                // Ẩn dòng nếu CẢ HAI xe đều có giá trị = 0 (hoặc không nhập)
+                if (aIsZero && bIsZero) return null;
               }
 
               const result = compareValue(valueA, valueB, field.rule);
